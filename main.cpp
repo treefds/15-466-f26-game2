@@ -101,6 +101,13 @@ int main(int argc, char **argv) {
 	//Set automatic SRGB encoding if framebuffer needs it:
 	glEnable(GL_FRAMEBUFFER_SRGB);
 
+	// Enable blend; 
+	// I think OpenGL by default disable blending for performance.
+	// And it needs to be manually enabled...
+	// https://learnopengl.com/Advanced-OpenGL/Blending
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	//Hide mouse cursor (note: showing can be useful for debugging):
 	//SDL_ShowCursor(SDL_DISABLE);
 

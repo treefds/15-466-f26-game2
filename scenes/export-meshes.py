@@ -177,7 +177,8 @@ for obj in bpy.data.objects:
 				col = colors.data[poly.loop_indices[i]].color
 			else:
 				col = (1.0, 1.0, 1.0, 1.0)
-			local_data += struct.pack('BBBB', int(col[0] * 255), int(col[1] * 255), int(col[2] * 255), 255)
+			# Keep Alpha channel!
+			local_data += struct.pack('BBBB', int(col[0] * 255), int(col[1] * 255), int(col[2] * 255), int(col[3] * 255))
 
 			if uvs != None:
 				uv = uvs[poly.loop_indices[i]].uv

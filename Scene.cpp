@@ -145,8 +145,18 @@ void Scene::draw(glm::mat4 const &clip_from_world, glm::mat4x3 const &light_from
 			}
 		}
 
+		// Force-disable depth test when drawing globe?
+		if (drawable.transform->name == "Globe") {
+			glDepthMask(GL_FALSE);
+		}
+
 		//draw the object:
 		glDrawArrays(pipeline.type, pipeline.start, pipeline.count);
+
+		// Re-enable the depth test?
+		if (drawable.transform->name == "Globe") {
+			glDepthMask(GL_TRUE);
+		}
 
 		//un-bind textures:
 		for (uint32_t i = 0; i < Drawable::Pipeline::TextureCount; ++i) {
