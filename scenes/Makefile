@@ -18,10 +18,18 @@ DIST=../dist
 all : \
 	$(DIST)/hexapod.pnct \
 	$(DIST)/hexapod.scene \
+	$(DIST)/snowglobe.pnct \
+	$(DIST)/snowglobe.scene \
 
 
 $(DIST)/hexapod.scene : hexapod.blend $(EXPORT_SCENE)
 	$(BLENDER) --background --python $(EXPORT_SCENE) -- '$<':Main '$@'
 
 $(DIST)/hexapod.pnct : hexapod.blend $(EXPORT_MESHES)
+	$(BLENDER) --background --python $(EXPORT_MESHES) -- '$<':Main '$@'
+
+$(DIST)/snowglobe.scene : snowglobe.blend $(EXPORT_SCENE)
+	$(BLENDER) --background --python $(EXPORT_SCENE) -- '$<':Main '$@'
+
+$(DIST)/snowglobe.pnct : snowglobe.blend $(EXPORT_MESHES)
 	$(BLENDER) --background --python $(EXPORT_MESHES) -- '$<':Main '$@'

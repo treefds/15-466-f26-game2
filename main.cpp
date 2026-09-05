@@ -40,9 +40,8 @@ int main(int argc, char **argv) {
 	}
 
 	//when compiled on windows, unhandled exceptions don't have their message printed, which can make debugging simple issues difficult.
-	try {
 #endif
-
+	try {
 	//------------  initialization ------------
 
 	//Initialize SDL library:
@@ -203,7 +202,7 @@ int main(int argc, char **argv) {
 
 	return 0;
 
-#ifdef _WIN32
+// #ifdef _WIN32
 	} catch (std::exception const &e) {
 		std::cerr << "Unhandled exception:\n" << e.what() << std::endl;
 		return 1;
@@ -211,5 +210,5 @@ int main(int argc, char **argv) {
 		std::cerr << "Unhandled exception (unknown type)." << std::endl;
 		throw;
 	}
-#endif
+// #endif
 }
