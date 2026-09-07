@@ -73,7 +73,7 @@ struct PlayMode : Mode {
 
 	// Player animation flags:
 	int player_anim_flag = 0;
-	// Player animation timer, used for anything?
+	// Player animation timer, used for death animation
 	float player_anim_timer = 0.0f;
 
 	// buried timer (how cold)
