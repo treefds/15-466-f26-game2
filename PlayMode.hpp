@@ -23,7 +23,7 @@ struct PlayMode : Mode {
 	struct Button {
 		uint8_t downs = 0;
 		uint8_t pressed = 0;
-	} left, right, down, up, space;
+	} left, right, down, up, space, reset;
 
 	//local copy of the game scene (so code can change it during gameplay):
 	Scene scene;
@@ -48,18 +48,27 @@ struct PlayMode : Mode {
 	Scene::Drawable *player = nullptr;
 	// The globe
 	Scene::Drawable *globe = nullptr;
+	// The player shadow
+	Scene::Drawable *shadow = nullptr;
+	// The Broom
+	Scene::Drawable *broom = nullptr;
+	// Eyebrow
+	Scene::Drawable *eyebrow = nullptr;
+	// Mouth
+	Scene::Drawable *mouth = nullptr;
 
 	// Player position
 	glm::vec3 player_pos;
 
 	// Player veclocity
 	glm::vec3 player_velocity { };
-	float player_target_facing;
+	float player_target_facing = 4.7f;
 
 	// shaking
 	float shake_timer = 0.0f;
 	int shake_count = 0;
 	float shake_anim_timer = 0.0f;
+	float survival_timer = 0.0f;
 
 
 	// Player animation flags:
