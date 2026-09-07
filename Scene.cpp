@@ -89,6 +89,8 @@ void Scene::draw(Camera const &camera) const {
 
 void Scene::draw(glm::mat4 const &clip_from_world, glm::mat4x3 const &light_from_world) const {
 
+	// Keep globe (for later rendering because it is transparent)
+	Scene::Drawable const *globe = nullptr;
 	//Iterate through all drawables, sending each one to OpenGL:
 	for (auto const &drawable : drawables) {
 		//Reference to drawable's pipeline for convenience:
@@ -137,6 +139,8 @@ void Scene::draw(glm::mat4 const &clip_from_world, glm::mat4x3 const &light_from
 		//set any requested custom uniforms:
 		if (pipeline.set_uniforms) pipeline.set_uniforms();
 
+		// no need to use blend for opaque mesh
+		glDisable(GL_BLEND);
 		//set up textures:
 		for (uint32_t i = 0; i < Drawable::Pipeline::TextureCount; ++i) {
 			if (pipeline.textures[i].texture != 0) {
@@ -147,17 +151,14 @@ void Scene::draw(glm::mat4 const &clip_from_world, glm::mat4x3 const &light_from
 
 		// Force-disable depth test when drawing globe?
 		if (drawable.transform->name == "Globe") {
-			glDepthMask(GL_FALSE);
+			globe = &drawable;
+			continue;
 		}
 
 		//draw the object:
 		glDrawArrays(pipeline.type, pipeline.start, pipeline.count);
 
-		// Re-enable the depth test?
-		if (drawable.transform->name == "Globe") {
-			glDepthMask(GL_TRUE);
-		}
-
+	
 		//un-bind textures:
 		for (uint32_t i = 0; i < Drawable::Pipeline::TextureCount; ++i) {
 			if (pipeline.textures[i].texture != 0) {
@@ -167,6 +168,64 @@ void Scene::draw(glm::mat4 const &clip_from_world, glm::mat4x3 const &light_from
 		}
 		glActiveTexture(GL_TEXTURE0);
 
+	}
+
+	// Globe must be drawn the last because transparency
+	// most code copied from above
+	if (globe != nullptr) { // draw globe
+		Scene::Drawable::Pipeline const &pipeline = globe->pipeline;
+		glUseProgram(pipeline.program);
+		glBindVertexArray(pipeline.vao);
+		assert(globe->transform); //drawables *must* have a transform
+		glm::mat4x3 world_from_object = globe->transform->make_world_from_local();
+		//CLIP_FROM_OBJECT takes vertices from object space to clip space:
+		if (pipeline.CLIP_FROM_OBJECT_mat4 != -1U) {
+			glm::mat4 clip_from_object = clip_from_world * glm::mat4(world_from_object);
+			glUniformMatrix4fv(pipeline.CLIP_FROM_OBJECT_mat4, 1, GL_FALSE, glm::value_ptr(clip_from_object));
+		}
+		//the object-to-light matrix is used in the next two uniforms:
+		glm::mat4x3 light_from_object = light_from_world * glm::mat4(world_from_object);
+		//CLIP_FROM_OBJECT takes vertices from object space to light space:
+		if (pipeline.LIGHT_FROM_OBJECT_mat4x3 != -1U) {
+			glUniformMatrix4x3fv(pipeline.LIGHT_FROM_OBJECT_mat4x3, 1, GL_FALSE, glm::value_ptr(light_from_object));
+		}
+		//LIGHT_FROM_NORMAL takes normals from object space to light space:
+		if (pipeline.LIGHT_FROM_NORMAL_mat3 != -1U) {
+			glm::mat3 light_from_normal = glm::inverse(glm::transpose(glm::mat3(light_from_object)));
+			glUniformMatrix3fv(pipeline.LIGHT_FROM_NORMAL_mat3, 1, GL_FALSE, glm::value_ptr(light_from_normal));
+		}
+
+		//set any requested custom uniforms:
+		if (pipeline.set_uniforms) pipeline.set_uniforms();
+
+		//set up textures:
+		for (uint32_t i = 0; i < Drawable::Pipeline::TextureCount; ++i) {
+			if (pipeline.textures[i].texture != 0) {
+				glActiveTexture(GL_TEXTURE0 + i);
+				glBindTexture(pipeline.textures[i].target, pipeline.textures[i].texture);
+			}
+		}
+
+		// REFERENCE: https://learnopengl.com/Advanced-OpenGL/Blending
+		// Enable blend
+		glEnable(GL_BLEND);
+		glDepthMask(GL_FALSE);
+
+		//draw the object:
+		glDrawArrays(pipeline.type, pipeline.start, pipeline.count);
+
+		// Disable blend
+		glDisable(GL_BLEND);
+		glDepthMask(GL_TRUE);
+	
+		//un-bind textures:
+		for (uint32_t i = 0; i < Drawable::Pipeline::TextureCount; ++i) {
+			if (pipeline.textures[i].texture != 0) {
+				glActiveTexture(GL_TEXTURE0 + i);
+				glBindTexture(pipeline.textures[i].target, 0);
+			}
+		}
+		glActiveTexture(GL_TEXTURE0);
 	}
 
 	glUseProgram(0);

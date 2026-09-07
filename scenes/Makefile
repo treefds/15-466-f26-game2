@@ -20,6 +20,8 @@ all : \
 	$(DIST)/hexapod.scene \
 	$(DIST)/snowglobe.pnct \
 	$(DIST)/snowglobe.scene \
+	$(DIST)/snowflake.pnct \
+	$(DIST)/snowflake.scene \
 
 
 $(DIST)/hexapod.scene : hexapod.blend $(EXPORT_SCENE)
@@ -32,4 +34,11 @@ $(DIST)/snowglobe.scene : snowglobe.blend $(EXPORT_SCENE)
 	$(BLENDER) --background --python $(EXPORT_SCENE) -- '$<':Main '$@'
 
 $(DIST)/snowglobe.pnct : snowglobe.blend $(EXPORT_MESHES)
+	$(BLENDER) --background --python $(EXPORT_MESHES) -- '$<':Main '$@'
+
+
+$(DIST)/snowflake.scene : snowflake.blend $(EXPORT_SCENE)
+	$(BLENDER) --background --python $(EXPORT_SCENE) -- '$<':Main '$@'
+
+$(DIST)/snowflake.pnct : snowflake.blend $(EXPORT_MESHES)
 	$(BLENDER) --background --python $(EXPORT_MESHES) -- '$<':Main '$@'
