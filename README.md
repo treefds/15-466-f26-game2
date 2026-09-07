@@ -22,6 +22,14 @@ I call the game design "sloppy" because it is inspired by the slop games that we
 - **WASD/Arrows**: Move
 - **R**: Reset game after game over
 
+Build and play:
+```bash
+# Recompile then play
+node Maekfile.js && ./dist/game
+# Or, rebuild assets, then recompile and play
+make -C scenes && node Maekfile.js && ./dist/game
+```
+
 ----
 
 Google, StackOverflow, and GL online documentations helped me a lot on using OpenGL (especially with transparency) and doing geometry. Blender was used to create the 3D assets.
